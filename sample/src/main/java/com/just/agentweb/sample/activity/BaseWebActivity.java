@@ -77,7 +77,6 @@ public class BaseWebActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         long p = System.currentTimeMillis();
-
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(mLinearLayout, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
@@ -91,6 +90,7 @@ public class BaseWebActivity extends AppCompatActivity {
                 .createAgentWeb()
                 .ready()
                 .go(getUrl());
+        mAgentWeb.getWebCreator().getWebView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         //mAgentWeb.getUrlLoader().loadUrl(getUrl());
 
