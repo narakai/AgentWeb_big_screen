@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -23,6 +27,11 @@ import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
 import com.just.agentweb.sample.R;
 import com.just.agentweb.sample.widget.WebLayout;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by cenxiaozhong on 2017/5/26.
@@ -64,7 +73,8 @@ public class BaseWebActivity extends AppCompatActivity {
                 showDialog();
             }
         });
-
+        mToolbar.setVisibility(View.GONE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         long p = System.currentTimeMillis();
 
@@ -86,7 +96,7 @@ public class BaseWebActivity extends AppCompatActivity {
 
         long n = System.currentTimeMillis();
         Log.i("Info", "init used time:" + (n - p));
-
+        hideSystemUI();
 
     }
 
@@ -113,7 +123,45 @@ public class BaseWebActivity extends AppCompatActivity {
     };
 
     public String getUrl() {
-        return "https://m.jd.com/";
+        try {
+            return readRaw();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    private String readRaw() throws IOException {
+        InputStream inputStream = getResources().openRawResource(R.raw.url);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String eachline = "";
+        try {
+            eachline = bufferedReader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            inputStream.close();
+            bufferedReader.close();
+        }
+        inputStream.close();
+        bufferedReader.close();
+        return eachline;
     }
 
 
